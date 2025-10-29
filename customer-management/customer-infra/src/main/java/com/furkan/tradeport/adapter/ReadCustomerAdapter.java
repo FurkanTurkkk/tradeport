@@ -1,10 +1,14 @@
 package com.furkan.tradeport.adapter;
 
+import com.furkan.tradeport.entity.JpaAddressEntity;
 import com.furkan.tradeport.entity.JpaCustomerEntity;
 import com.furkan.tradeport.model.Customer;
 import com.furkan.tradeport.persistence.SpringDataCustomerRepository;
 import com.furkan.tradeport.port.ReadCustomerPort;
+import com.furkan.tradeport.valueobject.Address;
 import com.furkan.tradeport.valueobject.CustomerId;
+import com.furkan.tradeport.valueobject.FullName;
+import com.furkan.tradeport.valueobject.IdNumber;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -28,6 +32,7 @@ public class ReadCustomerAdapter implements ReadCustomerPort {
     }
 
     private Customer toDomain(JpaCustomerEntity entity) {
+
         return new Customer(CustomerId.of(entity.getCustomerId()));
     }
 }

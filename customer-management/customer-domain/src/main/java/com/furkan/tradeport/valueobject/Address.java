@@ -62,6 +62,10 @@ public final class Address {
         return street;
     }
 
+    public Integer apartmentNumber() { return apartmentNumber; }
+
+    public Integer doorNumber() { return doorNumber; }
+
     /**
      * İki adresin eşit kabul edilmesi için tüm alanlarının aynı olması gerekir.
      */
