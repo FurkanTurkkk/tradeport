@@ -1,0 +1,34 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/tradePortDb
+    username: postgres
+    password: 123321
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+
+server:
+  port: 9090
+
+security:
+  jwt:
+    secret: "gfgdfhfghjtrdregbewWWDSFSDFsdfwefsdfsdfsdfsdfsdfwsdfsdfsdf"
+    expiration-ms: 3600000
+
+internal:
+  secret:
+    key: "asasfhfghjtrdregbewWWDSFSDFsdfwefsdfsdfsdfsdfsdfwsdfsdfsdf"
