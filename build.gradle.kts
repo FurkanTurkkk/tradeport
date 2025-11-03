@@ -23,6 +23,9 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.postgresql:postgresql:42.7.7")
 
+    // Batch
+    implementation(project(":common:cron-jobs"))
+
     // User-management dependencies
     implementation(project(":user-management:user-api"))
     implementation(project(":user-management:user-infra"))
@@ -30,6 +33,14 @@ dependencies {
     // Customer-management dependencies
     implementation(project(":customer-management:customer-api"))
     implementation(project(":customer-management:customer-infra"))
+
+	// Product-management dependencies
+    implementation(project(":product-management:product-api"))
+    implementation(project(":product-management:product-infra"))
+
+    // Category-management dependencies
+    implementation(project(":category-management:category-api"))
+    implementation(project(":category-management:category-infra"))
 
     // Test
 	testImplementation("org.springframework.boot:spring-boot-starter-test")

@@ -14,8 +14,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web:3.5.6")
     implementation("org.springframework.boot:spring-boot-starter-security:3.5.6") // AuthenticationPrincipal anotasyonu için
 
-    implementation(project(":exception"))
-    implementation(project(":security"))
+    implementation(project(":common:exception"))
+    implementation(project(":common:rabbitmq"))
+    implementation(project(":common:security"))
 
     implementation(project(":user-management:user-domain"))
     implementation(project(":user-management:user-application"))

@@ -1,5 +1,7 @@
 package com.furkan.tradeport.valueobject;
 
+import com.furkan.tradeport.exception.CustomerDomainException;
+
 import java.util.Objects;
 
 public final class Address {
@@ -19,19 +21,19 @@ public final class Address {
                    Integer doorNumber) {
 
         if (isBlank(country)) {
-            throw new IllegalArgumentException("Ülke bilgisi boş olamaz");
+            throw new CustomerDomainException("Ülke bilgisi boş olamaz");
         }
         if (isBlank(city)) {
-            throw new IllegalArgumentException("Şehir bilgisi boş olamaz");
+            throw new CustomerDomainException("Şehir bilgisi boş olamaz");
         }
         if (isBlank(district)) {
-            throw new IllegalArgumentException("İlçe bilgisi boş olamaz");
+            throw new CustomerDomainException("İlçe bilgisi boş olamaz");
         }
         if(apartmentNumber == null || apartmentNumber <= 0) {
-            throw new IllegalArgumentException("Apartman numarası boş olamaz");
+            throw new CustomerDomainException("Apartman numarası boş olamaz");
         }
         if(doorNumber == null || doorNumber <= 0) {
-            throw new IllegalArgumentException("Kapı numarası boş olamaz");
+            throw new CustomerDomainException("Kapı numarası boş olamaz");
         }
 
         this.country = country.trim();

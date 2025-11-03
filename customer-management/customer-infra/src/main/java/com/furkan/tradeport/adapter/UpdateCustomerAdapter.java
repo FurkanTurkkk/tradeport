@@ -2,7 +2,11 @@ package com.furkan.tradeport.adapter;
 
 import com.furkan.tradeport.entity.JpaAddressEntity;
 import com.furkan.tradeport.entity.JpaCustomerEntity;
+import com.furkan.tradeport.exception.AddressEntityAlreadyExistException;
+import com.furkan.tradeport.exception.CustomerEntityNotFoundException;
+import com.furkan.tradeport.exception.IdNumberAlreadyExistException;
 import com.furkan.tradeport.model.Customer;
+import com.furkan.tradeport.persistence.SpringDataAddressRepository;
 import com.furkan.tradeport.persistence.SpringDataCustomerRepository;
 import com.furkan.tradeport.port.UpdateCustomerPort;
 import com.furkan.tradeport.valueobject.Address;
@@ -10,94 +14,107 @@ import com.furkan.tradeport.valueobject.CustomerId;
 import com.furkan.tradeport.valueobject.FullName;
 import com.furkan.tradeport.valueobject.IdNumber;
 import org.springframework.stereotype.Component;
-
 import java.util.Optional;
 
 @Component
 public class UpdateCustomerAdapter implements UpdateCustomerPort {
-    private final SpringDataCustomerRepository repository;
+    private final SpringDataCustomerRepository customerRepository;
+    private final AddressService addressService;
 
-    public UpdateCustomerAdapter(SpringDataCustomerRepository repository) {
-        this.repository = repository;
+    public UpdateCustomerAdapter(SpringDataCustomerRepository customerRepository,
+                                 AddressService addressService) {
+        this.customerRepository = customerRepository;
+        this.addressService = addressService;
     }
 
     @Override
     public Customer updateCustomer(Customer customer) {
         String customerId = customer.getCustomerId().asString();
-        JpaCustomerEntity entity = repository.findByCustomerId(customerId)
-                .orElseThrow(() -> new RuntimeException("Customer not found in infra layer"));
+        JpaCustomerEntity customerEntity = customerRepository.findByCustomerId(customerId)
+                .orElseThrow(() -> new CustomerEntityNotFoundException("Customer not found in infra layer"));
 
-        updateCustomerEntity(entity, customer);
-        repository.save(entity);
-        return toDomain(entity);
+        updateCustomerEntity(customerEntity, customer);
+        JpaCustomerEntity saved = customerRepository.save(customerEntity);
+
+        return toDomain(saved);
     }
 
-    private void updateCustomerEntity(JpaCustomerEntity existingEntity, Customer updatedCustomer) {
-        // FullName varsa güncelle
+    private void updateCustomerEntity(JpaCustomerEntity customerEntity, Customer updatedCustomer) {
+
         if (updatedCustomer.getFullname() != null) {
             String newFirstname = updatedCustomer.getFullname().firstName();
             String newLastname = updatedCustomer.getFullname().lastName();
-
-            // null değilse değiştir, değilse eskiyi koru
-            existingEntity.setFirstname(newFirstname != null ? newFirstname : existingEntity.getFirstname());
-            existingEntity.setLastname(newLastname != null ? newLastname : existingEntity.getLastname());
+            customerEntity.setFirstname(newFirstname != null ? newFirstname : customerEntity.getFirstname());
+            customerEntity.setLastname(newLastname != null ? newLastname : customerEntity.getLastname());
         }
 
-        // IdNumber varsa güncelle
         if (updatedCustomer.getIdNumber() != null) {
-            existingEntity.setIdNumber(updatedCustomer.getIdNumber().asString());
+            handleIdNumberUpdate(customerEntity, updatedCustomer);
         }
 
-        // Address varsa güncelle
         if (updatedCustomer.getAddress() != null) {
-            JpaAddressEntity existingAddress = getJpaAddressEntity(existingEntity, updatedCustomer);
-            existingEntity.setAddress(existingAddress);
+            handleAddressUpdate(customerEntity, updatedCustomer);
+        }
+    }
+
+    private void handleIdNumberUpdate(JpaCustomerEntity customerEntity, Customer updatedCustomer) {
+        String newIdNumber = updatedCustomer.getIdNumber().asString();
+        Optional<JpaCustomerEntity> customer = customerRepository.findByIdNumber(newIdNumber);
+        if(customer.isPresent()) {
+            throw new IdNumberAlreadyExistException("Bu kimlik numarası başka bir müşteriye ait");
+        }
+        customerEntity.setIdNumber(newIdNumber);
+    }
+
+    private void handleAddressUpdate(JpaCustomerEntity customerEntity, Customer updatedCustomer) {
+        Address newAddress = updatedCustomer.getAddress();
+        JpaAddressEntity currentAddress = customerEntity.getAddress();
+
+        if (currentAddress != null &&
+                newAddress.equals(new Address(
+                        currentAddress.getCountry(),
+                        currentAddress.getCity(),
+                        currentAddress.getDistrict(),
+                        currentAddress.getStreet(),
+                        currentAddress.getApartmentNumber(),
+                        currentAddress.getDoorNumber()
+                ))) {
+            return;
         }
 
+        Optional<JpaAddressEntity> existingAddress = addressService.findByAllFields(newAddress);
+        if (existingAddress.isPresent()) {
+            customerEntity.setAddress(existingAddress.get());
+            return;
+        }
+
+        JpaAddressEntity newAddressEntity = new JpaAddressEntity();
+        newAddressEntity.setCountry(newAddress.country());
+        newAddressEntity.setCity(newAddress.city());
+        newAddressEntity.setDistrict(newAddress.district());
+        newAddressEntity.setStreet(newAddress.street());
+        newAddressEntity.setApartmentNumber(newAddress.apartmentNumber());
+        newAddressEntity.setDoorNumber(newAddress.doorNumber());
+
+        JpaAddressEntity savedAddress = addressService.saveAddress(newAddressEntity);
+        customerEntity.setAddress(savedAddress);
     }
-
-
-    private static JpaAddressEntity getJpaAddressEntity(JpaCustomerEntity existingEntity, Customer updatedCustomer) {
-        JpaAddressEntity existingAddress = existingEntity.getAddress();
-        if (existingAddress == null)
-            existingAddress = new JpaAddressEntity();
-
-        Address updatedAddress = updatedCustomer.getAddress();
-
-        if (updatedAddress.country() != null)
-            existingAddress.setCountry(updatedAddress.country());
-
-        if (updatedAddress.city() != null)
-            existingAddress.setCity(updatedAddress.city());
-
-        if (updatedAddress.district() != null)
-            existingAddress.setDistrict(updatedAddress.district());
-
-        if (updatedAddress.street() != null)
-            existingAddress.setStreet(updatedAddress.street());
-
-        if (updatedAddress.apartmentNumber() != null)
-            existingAddress.setApartmentNumber(updatedAddress.apartmentNumber());
-
-        if (updatedAddress.doorNumber() != null)
-            existingAddress.setDoorNumber(updatedAddress.doorNumber());
-        return existingAddress;
-    }
-
 
     private Customer toDomain(JpaCustomerEntity entity) {
         FullName fullName = new FullName(entity.getFirstname(), entity.getLastname());
         IdNumber idNumber = new IdNumber(entity.getIdNumber());
-        JpaAddressEntity addressEntity = entity.getAddress();
         Address address = null;
-        if(addressEntity != null) {
-            address = new Address(addressEntity.getCountry(),
-                    addressEntity.getCity(),
-                    addressEntity.getDistrict(),
-                    addressEntity.getStreet(),
-                    addressEntity.getApartmentNumber(),
-                    addressEntity.getDoorNumber());
+        JpaAddressEntity addr = entity.getAddress();
+        if (addr != null) {
+            address = new Address(
+                    addr.getCountry(),
+                    addr.getCity(),
+                    addr.getDistrict(),
+                    addr.getStreet(),
+                    addr.getApartmentNumber(),
+                    addr.getDoorNumber()
+            );
         }
-        return new Customer(CustomerId.of(entity.getCustomerId()),fullName,idNumber,address);
+        return new Customer(CustomerId.of(entity.getCustomerId()), fullName, idNumber, address);
     }
 }

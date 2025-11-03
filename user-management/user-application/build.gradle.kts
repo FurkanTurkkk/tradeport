@@ -15,9 +15,9 @@ dependencies {
     implementation(project(":user-management:user-domain"))
 
     // For Exception
-    implementation(project(":exception"))
+    implementation(project(":common:exception"))
 
-    implementation(project(":rabbitmq"))
+    implementation(project(":common:rabbitmq"))
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")

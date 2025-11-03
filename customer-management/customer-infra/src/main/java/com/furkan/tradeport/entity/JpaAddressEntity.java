@@ -2,12 +2,11 @@ package com.furkan.tradeport.entity;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
-@Table(name = "addresses", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {
-                "country", "city", "district", "street", "apartmentNumber", "doorNumber"
-        })
-})
+@Table(name = "addresses")
 public class JpaAddressEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,6 +18,9 @@ public class JpaAddressEntity {
     private String street;
     private Integer apartmentNumber;
     private Integer doorNumber;
+
+    @OneToMany(mappedBy = "address")
+    private List<JpaCustomerEntity> customers = new ArrayList<>();
 
     public JpaAddressEntity() {
     }

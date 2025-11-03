@@ -14,8 +14,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.5.4")
     implementation("org.springframework.boot:spring-boot-starter-security:3.5.6")
 
-    implementation(project(":rabbitmq"))
+    implementation(project(":common:rabbitmq"))
     implementation(project(":customer-management:customer-domain"))
+    implementation(project(":common:exception"))
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")

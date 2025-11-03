@@ -13,7 +13,7 @@ public class JpaCustomerEntity {
     private String firstname;
     private String lastname;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToOne
     @JoinColumn(name = "address_id")
     private JpaAddressEntity address;
 

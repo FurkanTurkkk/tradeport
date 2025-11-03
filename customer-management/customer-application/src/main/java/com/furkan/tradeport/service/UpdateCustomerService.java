@@ -1,6 +1,7 @@
 package com.furkan.tradeport.service;
 
 import com.furkan.tradeport.command.UpdateCustomerCommand;
+import com.furkan.tradeport.exception.CustomerNotFoundException;
 import com.furkan.tradeport.model.Customer;
 import com.furkan.tradeport.port.ReadCustomerPort;
 import com.furkan.tradeport.port.UpdateCustomerPort;
@@ -24,17 +25,25 @@ public class UpdateCustomerService implements UpdateCustomerUseCase {
     public Customer updateCustomer(String customerId,UpdateCustomerCommand command) {
         Optional<Customer> customer = readCustomerPort.findById(customerId);
         if(customer.isEmpty()) {
-            throw new RuntimeException("Customer can not found");
+            throw new CustomerNotFoundException("Customer can not found");
         }
-        changeFullname(customer.get(),command);
+        changeFullName(customer.get(),command);
         changeIdNumber(customer.get(),command);
         changeAddress(customer.get(),command);
         return updateCustomerPort.updateCustomer(customer.get());
     }
 
-    private void changeFullname(Customer customer, UpdateCustomerCommand command) {
+    private void changeFullName(Customer customer, UpdateCustomerCommand command) {
         if(command.firstname() != null && command.lastname() != null) {
             customer.changeFullName(new FullName(command.firstname(),command.lastname()));
+            return;
+        }
+        if(command.firstname() != null) {
+            customer.changeFullName(new FullName(command.firstname(),customer.getFullname().lastName()));
+            return;
+        }
+        if(command.lastname() != null) {
+            customer.changeFullName(new FullName(customer.getFullname().firstName(),command.lastname()));
         }
     }
 
@@ -89,6 +98,4 @@ public class UpdateCustomerService implements UpdateCustomerUseCase {
                 command.doorNumber()
         );
     }
-
-
 }

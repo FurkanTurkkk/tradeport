@@ -22,7 +22,8 @@ dependencies {
 
     implementation(project(":user-management:user-domain"))
 
-    implementation(project(":security"))
+    implementation(project(":common:rabbitmq"))
+    implementation(project(":common:security"))
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")

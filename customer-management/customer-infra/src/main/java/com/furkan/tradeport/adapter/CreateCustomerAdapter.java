@@ -18,7 +18,6 @@ public class CreateCustomerAdapter implements CreateCustomerPort {
     @Override
     public Customer createCustomer(String userId) {
         JpaCustomerEntity customerEntity = repository.save(new JpaCustomerEntity(CustomerId.random().asString(), userId));
-        System.out.println("Customer Created Successfully");
         return toDomain(customerEntity);
     }
 

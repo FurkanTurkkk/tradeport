@@ -42,18 +42,15 @@ public class Customer {
         return address;
     }
 
-    public Address changeAddress(Address address) {
+    public void changeAddress(Address address) {
         this.address = address;
-        return address;
     }
 
-    public IdNumber changeIdNumber(IdNumber idNumber) {
+    public void changeIdNumber(IdNumber idNumber) {
         this.idNumber = idNumber;
-        return idNumber;
     }
 
-    public FullName changeFullName(FullName fullname) {
+    public void changeFullName(FullName fullname) {
         this.fullname = fullname;
-        return fullname;
     }
 }

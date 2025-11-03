@@ -1,5 +1,7 @@
 package com.furkan.tradeport.valueobject;
 
+import com.furkan.tradeport.exception.CustomerDomainException;
+
 import java.text.Normalizer;
 import java.util.Objects;
 
@@ -13,21 +15,21 @@ public final class FullName {
 
     public FullName(String firstName, String lastName) {
         if (firstName == null || firstName.isBlank()) {
-            throw new IllegalArgumentException("İsim alanı boş olamaz");
+            throw new CustomerDomainException("İsim alanı boş olamaz");
         }
 
         String normalizedFirst = normalize(firstName);
         String normalizedLast = normalize(lastName);
 
         if (!normalizedFirst.matches(NAME_PATTERN)) {
-            throw new IllegalArgumentException("İsim yalnızca harf içerebilir");
+            throw new CustomerDomainException("İsim yalnızca harf içerebilir");
         }
         if (!normalizedLast.matches(NAME_PATTERN)) {
-            throw new IllegalArgumentException("Soyisim yalnızca harf içerebilir");
+            throw new CustomerDomainException("Soyisim yalnızca harf içerebilir");
         }
 
         if (normalizedFirst.length() > MAX_LENGTH || normalizedLast.length() > MAX_LENGTH) {
-            throw new IllegalArgumentException("İsim veya soyisim çok uzun");
+            throw new CustomerDomainException("İsim veya soyisim çok uzun");
         }
 
         this.firstName = capitalize(normalizedFirst);
@@ -35,7 +37,6 @@ public final class FullName {
     }
 
     private static String normalize(String input) {
-        // Fazla boşlukları temizle, Unicode normalize et
         return Normalizer.normalize(input.trim(), Normalizer.Form.NFC);
     }
 

@@ -1,5 +1,7 @@
 package com.furkan.tradeport.valueobject;
 
+import com.furkan.tradeport.exception.CustomerDomainException;
+
 import java.util.Objects;
 
 public final class IdNumber {
@@ -8,16 +10,16 @@ public final class IdNumber {
 
     public IdNumber(String value) {
         if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException("TC kimlik numarası boş olamaz");
+            throw new CustomerDomainException("TC kimlik numarası boş olamaz");
         }
         if (!value.matches("\\d{11}")) {
-            throw new IllegalArgumentException("TC kimlik numarası 11 haneli olmalı ve sadece rakam içermelidir");
+            throw new CustomerDomainException("TC kimlik numarası 11 haneli olmalı ve sadece rakam içermelidir");
         }
         if (value.charAt(0) == '0') {
-            throw new IllegalArgumentException("TC kimlik numarası 0 ile başlayamaz");
+            throw new CustomerDomainException("TC kimlik numarası 0 ile başlayamaz");
         }
         if (!isValidIdNumber(value)) {
-            throw new IllegalArgumentException("Geçersiz TC kimlik numarası");
+            throw new CustomerDomainException("Geçersiz TC kimlik numarası");
         }
 
         this.value = value;
@@ -39,8 +41,7 @@ public final class IdNumber {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof IdNumber)) return false;
-        IdNumber tckn = (IdNumber) o;
+        if (!(o instanceof IdNumber tckn)) return false;
         return value.equals(tckn.value);
     }
 

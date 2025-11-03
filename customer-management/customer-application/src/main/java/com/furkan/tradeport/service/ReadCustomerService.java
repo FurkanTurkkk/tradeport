@@ -1,5 +1,6 @@
 package com.furkan.tradeport.service;
 
+import com.furkan.tradeport.exception.CustomerNotFoundException;
 import com.furkan.tradeport.model.Customer;
 import com.furkan.tradeport.port.ReadCustomerPort;
 import com.furkan.tradeport.usecase.ReadCustomerUseCase;
@@ -29,6 +30,6 @@ public class ReadCustomerService implements ReadCustomerUseCase {
         if (customer.isPresent()) {
             return customer.get();
         }
-        throw new RuntimeException("Customer not found");
+        throw new CustomerNotFoundException("Customer not found");
     }
 }

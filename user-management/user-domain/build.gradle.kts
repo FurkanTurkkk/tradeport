@@ -12,7 +12,7 @@ repositories {
 dependencies {
 
     // For Exception
-    implementation(project(":exception"))
+    implementation(project(":common:exception"))
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
