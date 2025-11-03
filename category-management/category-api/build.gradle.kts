@@ -1,0 +1,29 @@
+plugins {
+    id("java")
+}
+
+group = "com.furkan"
+version = "0.0.1-SNAPSHOT"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-web:3.5.6")
+    implementation("org.springframework.boot:spring-boot-starter-security:3.5.6")
+
+    implementation(project(":common:exception"))
+    implementation(project(":common:rabbitmq"))
+    implementation(project(":common:security"))
+    implementation(project(":category-management:category-domain"))
+    implementation(project(":category-management:category-application"))
+
+    testImplementation(platform("org.junit:junit-bom:5.10.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
